@@ -5,6 +5,14 @@
       "type": "local",
       "command": ["py", "-X", "utf8", "mcp_casino.py"],
       "enabled": true
+    },
+    "github": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/github"],
+      "enabled": false,
+      "environment": {
+        "GITHUB_TOKEN": "{env:GITHUB_TOKEN}"
+      }
     }
   }
 }
