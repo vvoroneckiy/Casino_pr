@@ -64,6 +64,9 @@ def inject_user():
 
 
 def get_local_ip():
+    host_ip = os.environ.get("HOST_IP")
+    if host_ip:
+        return host_ip
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
