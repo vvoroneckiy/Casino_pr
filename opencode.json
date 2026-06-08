@@ -1,0 +1,10 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "casino": {
+      "type": "local",
+      "command": ["py", "-X", "utf8", "mcp_casino.py"],
+      "enabled": true
+    }
+  }
+}
