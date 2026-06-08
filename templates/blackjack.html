@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Блэкджек{% endblock %}
+{% block content %}
+<h1>♠ Блэкджек</h1>
+
+<div class="card" id="game-area">
+    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px;">
+            <h3 style="color: #ef4444;">👤 Дилер</h3>
+            <div id="dealer-cards" style="font-size: 1.5rem; margin: 0.5rem 0;">—</div>
+            <div id="dealer-value" style="color: #9ca3af;">—</div>
+        </div>
+        <div style="flex: 1; min-width: 200px;">
+            <h3 style="color: #10b981;">🃏 Игрок</h3>
+            <div id="player-cards" style="font-size: 1.5rem; margin: 0.5rem 0;">—</div>
+            <div id="player-value" style="color: #9ca3af;">—</div>
+        </div>
+    </div>
+
+    <div id="bet-area" style="margin-top: 1.5rem;">
+        <label>Ставка (₽):</label>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+            <input type="number" id="bet-input" min="10" value="100" style="width: 150px;">
+            <button class="btn btn-gold" onclick="startGame()">🃏 Раздать</button>
+        </div>
+    </div>
+
+    <div id="actions" style="display: none; margin-top: 1.5rem; gap: 0.5rem;">
+        <button class="btn btn-blue" onclick="hit()">👊 Ещё</button>
+        <button class="btn btn-red" onclick="stand()">✋ Хватит</button>
+    </div>
+
+    <div id="result" style="margin-top: 1rem; font-size: 1.2rem; font-weight: bold;"></div>
+</div>
+
+<script>
+let gameActive = false;
+
+function cardStr(c) {
+    if (c.rank === '?') return '🂠';
+    const red = c.suit === '♥' || c.suit === '♦';
+    return `<span style="color: ${red ? '#ef4444' : '#fff'}">${c.suit}${c.rank}</span>`;
+}
+
+function startGame() {
+    const bet = document.getElementById('bet-input').value;
+    fetch('/blackjack/start', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({bet: parseInt(bet)})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) { document.getElementById('result').textContent = '❌ ' + data.error; return; }
+        gameActive = true;
+        document.getElementById('dealer-cards').innerHTML = data.dealer.map(cardStr).join(' ');
+        document.getElementById('player-cards').innerHTML = data.player.map(cardStr).join(' ');
+        document.getElementById('player-value').textContent = 'Очки: ' + data.player_value;
+        document.getElementById('bet-area').style.display = 'none';
+        document.getElementById('actions').style.display = 'flex';
+        document.getElementById('result').textContent = '';
+    });
+}
+
+function hit() {
+    if (!gameActive) return;
+    fetch('/blackjack/hit', {method: 'POST'})
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById('player-cards').innerHTML = data.player.map(cardStr).join(' ');
+        document.getElementById('player-value').textContent = 'Очки: ' + data.player_value;
+        if (data.bust) {
+            gameActive = false;
+            document.getElementById('actions').style.display = 'none';
+            document.getElementById('result').innerHTML = '💥 Перебор! Ты проиграл. <button class="btn btn-gold" onclick="resetGame()" style="margin-left:1rem;">Ещё раз</button>';
+        }
+    });
+}
+
+function stand() {
+    if (!gameActive) return;
+    gameActive = false;
+    fetch('/blackjack/stand', {method: 'POST'})
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById('dealer-cards').innerHTML = data.dealer.map(cardStr).join(' ');
+        document.getElementById('dealer-value').textContent = 'Очки: ' + data.dealer_value;
+        document.getElementById('actions').style.display = 'none';
+
+        let msg = '';
+        if (data.result === 'win') msg = '🎉 Ты выиграл!';
+        else if (data.result === 'lose') msg = '😞 Ты проиграл.';
+        else msg = '🤝 Ничья!';
+
+        updateBalance(data.balance);
+        document.getElementById('result').innerHTML = `${msg} <button class="btn btn-gold" onclick="resetGame()" style="margin-left:1rem;">Ещё раз</button>`;
+    });
+}
+
+function resetGame() {
+    document.getElementById('dealer-cards').textContent = '—';
+    document.getElementById('player-cards').textContent = '—';
+    document.getElementById('dealer-value').textContent = '—';
+    document.getElementById('player-value').textContent = '—';
+    document.getElementById('result').textContent = '';
+    document.getElementById('bet-area').style.display = 'block';
+    document.getElementById('actions').style.display = 'none';
+}
+</script>
+{% endblock %}

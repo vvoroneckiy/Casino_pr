@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Casino{% endblock %}
+{% block content %}
+<h1>🎰 Добро пожаловать, {{ user.username }}!</h1>
+<div class="card">
+    <h2 style="color: #f59e0b; margin-bottom: 1rem;">💰 Твой баланс: {{ user.balance }} ₽</h2>
+    <a href="{{ url_for('deposit_form') }}" class="btn btn-green">💳 Пополнить счёт</a>
+</div>
+<div class="games-grid">
+    <div class="game-card">
+        <div class="icon">♠️</div>
+        <h2>Блэкджек</h2>
+        <p>Сыграй против дилера — кто ближе к 21!</p>
+        <a href="{{ url_for('blackjack') }}" class="btn btn-gold">Играть</a>
+    </div>
+    <div class="game-card">
+        <div class="icon">🎡</div>
+        <h2>Рулетка</h2>
+        <p>Ставь на цвет, число или диапазон!</p>
+        <a href="{{ url_for('roulette') }}" class="btn btn-gold">Играть</a>
+    </div>
+</div>
+{% endblock %}

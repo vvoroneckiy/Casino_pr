@@ -1,0 +1,8 @@
+__pycache__
+*.pyc
+*.db
+server.py
+client.py
+test_weather.py
+server_log.txt
+server_err.txt

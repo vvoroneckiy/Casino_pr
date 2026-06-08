@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Рулетка{% endblock %}
+{% block content %}
+<h1>🎡 Рулетка</h1>
+
+<div class="card" style="text-align: center;">
+    <div id="result-display" style="font-size: 4rem; margin: 1rem 0; min-height: 100px;">
+        <span style="color: #6b7280;">?</span>
+    </div>
+    <p style="color: #9ca3af; margin-bottom: 1rem;" id="spin-status">Сделай ставку и крути!</p>
+
+    <div style="margin-bottom: 1.5rem;">
+        <label>Ставка (₽):</label>
+        <input type="number" id="bet-amount" min="10" value="100" style="width: 150px; display: inline-block;">
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+        <button class="btn btn-red" onclick="spin('color','red')" style="background:#dc2626;">🔴 Красное</button>
+        <button class="btn" onclick="spin('color','black')" style="background:#1f2937; color:#fff; border:1px solid #374151;">⚫ Чёрное</button>
+        <button class="btn btn-green" onclick="spin('color','green')" style="background:#059669;">🟢 Зеро</button>
+    </div>
+    <div style="margin-bottom: 1rem;">
+        <button class="btn btn-blue" onclick="spin('parity','even')">Чёт</button>
+        <button class="btn btn-blue" onclick="spin('parity','odd')">Нечет</button>
+    </div>
+    <div style="margin-bottom: 1rem;">
+        <button class="btn btn-blue" onclick="spin('range','1-18')">1-18</button>
+        <button class="btn btn-blue" onclick="spin('range','19-36')">19-36</button>
+    </div>
+    <div>
+        <p style="color: #9ca3af; margin-bottom: 0.5rem;">Ставка на число:</p>
+        <input type="number" id="number-input" min="0" max="36" value="7" placeholder="0-36"
+               style="width: 100px; display: inline-block;">
+        <button class="btn btn-gold" onclick="spin('number', parseInt(document.getElementById('number-input').value))">
+            🎯 Крутить!
+        </button>
+    </div>
+
+    <div id="spin-result" style="margin-top: 1.5rem; font-size: 1.2rem; font-weight: bold;"></div>
+</div>
+
+<script>
+function spin(type, value) {
+    const amount = parseInt(document.getElementById('bet-amount').value);
+    document.getElementById('spin-result').textContent = '⏳ Крутится...';
+    document.getElementById('spin-status').textContent = '⏳';
+
+    fetch('/roulette/spin', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({type, value, amount})
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) {
+            document.getElementById('spin-result').textContent = '❌ ' + data.error;
+            return;
+        }
+
+        const colors = {red: '#dc2626', black: '#1f2937', green: '#059669'};
+        const display = document.getElementById('result-display');
+        display.innerHTML = `<span style="color: ${colors[data.color]}; background: #1f2937; padding: 0.5rem 1.5rem; border-radius: 50%; border: 3px solid ${colors[data.color]};">${data.number}</span>`;
+        document.getElementById('spin-status').textContent = `🎯 ${data.color === 'red' ? 'Красное' : data.color === 'black' ? 'Чёрное' : 'Зеро'}!`;
+
+        updateBalance(data.balance);
+
+        if (data.win) {
+            document.getElementById('spin-result').innerHTML =
+                `🎉 <span style="color: #10b981;">Выигрыш: ${data.payout} ₽ (x${data.multiplier})</span>`;
+        } else {
+            document.getElementById('spin-result').innerHTML =
+                `😞 <span style="color: #ef4444;">Проигрыш: -${amount} ₽</span>`;
+        }
+    });
+}
+</script>
+{% endblock %}

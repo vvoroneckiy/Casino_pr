@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 400px; margin: 3rem auto;">
+    <h1>Вход</h1>
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+    <form method="POST">
+        <div style="margin-bottom: 1rem;">
+            <label>Логин</label>
+            <input type="text" name="username" required>
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+            <label>Пароль</label>
+            <input type="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-gold" style="width:100%">Войти</button>
+    </form>
+    <p style="margin-top: 1rem; text-align: center; color: #9ca3af;">
+        Нет аккаунта? <a href="{{ url_for('register') }}" style="color: #f59e0b;">Регистрация</a>
+    </p>
+</div>
+{% endblock %}

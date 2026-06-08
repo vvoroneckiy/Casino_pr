@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подтверждение оплаты</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0e1a;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .card {
+            background: #111827;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid #1f2937;
+        }
+        h1 { color: #f59e0b; margin-bottom: 1rem; font-size: 1.5rem; }
+        .amount {
+            font-size: 2.5rem;
+            color: #10b981;
+            font-weight: bold;
+            margin: 1.5rem 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .btn-green { background: #10b981; color: #fff; }
+        .btn-green:hover { background: #059669; }
+        .btn-green:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-gray { background: #374151; color: #9ca3af; cursor: not-allowed; }
+        .success { color: #10b981; font-size: 1.2rem; margin-top: 1rem; }
+        .error { color: #ef4444; margin-top: 1rem; }
+        p { color: #9ca3af; margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🎰 Casino</h1>
+        <p>Подтверждение пополнения</p>
+        <div class="amount" id="amount-display">{{ amount }} ₽</div>
+
+        <button id="confirm-btn" class="btn btn-green" onclick="confirmPayment()">
+            ✅ Подтвердить оплату
+        </button>
+
+        <div id="status" style="margin-top: 1.5rem;"></div>
+    </div>
+
+    <script>
+    function confirmPayment() {
+        const btn = document.getElementById('confirm-btn');
+        btn.disabled = true;
+        btn.textContent = '⏳ Обработка...';
+
+        fetch('/pay/{{ token }}/confirm')
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'confirmed' || data.status === 'already_confirmed') {
+                    document.getElementById('status').innerHTML =
+                        '<div class="success">✅ Оплата подтверждена! Можешь закрыть страницу.</div>';
+                    btn.textContent = '✅ Подтверждено';
+                } else {
+                    throw new Error('Ошибка');
+                }
+            })
+            .catch(() => {
+                document.getElementById('status').innerHTML =
+                    '<div class="error">❌ Ошибка подтверждения</div>';
+                btn.disabled = false;
+                btn.textContent = '✅ Подтвердить оплату';
+            });
+    }
+    </script>
+</body>
+</html>

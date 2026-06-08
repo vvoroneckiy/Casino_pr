@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Casino{% endblock %}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        nav {
+            background: #111827;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1f2937;
+        }
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #f59e0b;
+            text-decoration: none;
+        }
+        nav .links { display: flex; gap: 1.5rem; align-items: center; }
+        nav .links a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        nav .links a:hover { color: #f59e0b; }
+        nav .balance {
+            background: #1f2937;
+            padding: 0.4rem 1rem;
+            border-radius: 8px;
+            color: #f59e0b;
+            font-weight: bold;
+        }
+        nav .logout { color: #ef4444 !important; }
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+        .card {
+            background: #111827;
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid #1f2937;
+            margin-bottom: 1.5rem;
+        }
+        .btn {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-gold { background: #f59e0b; color: #000; }
+        .btn-gold:hover { background: #d97706; }
+        .btn-red { background: #ef4444; color: #fff; }
+        .btn-red:hover { background: #dc2626; }
+        .btn-green { background: #10b981; color: #fff; }
+        .btn-green:hover { background: #059669; }
+        .btn-blue { background: #3b82f6; color: #fff; }
+        .btn-blue:hover { background: #2563eb; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        input, select {
+            background: #1f2937;
+            border: 1px solid #374151;
+            color: #e0e0e0;
+            padding: 0.7rem 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 100%;
+        }
+        input:focus { outline: none; border-color: #f59e0b; }
+        .error { color: #ef4444; margin-bottom: 1rem; }
+        h1 { color: #f59e0b; margin-bottom: 1.5rem; }
+        .games-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        .game-card {
+            background: #1f2937;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid #374151;
+            transition: border-color 0.2s;
+        }
+        .game-card:hover { border-color: #f59e0b; }
+        .game-card h2 { color: #f59e0b; margin-bottom: 0.5rem; }
+        .game-card p { color: #9ca3af; margin-bottom: 1.5rem; }
+        .game-card .icon { font-size: 3rem; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('index') }}" class="logo">🎰 Casino</a>
+        <div class="links">
+            {% if session.user_id %}
+                <span class="balance">💰 <span id="nav-balance">{{ user.balance }}</span> ₽</span>
+                <a href="{{ url_for('blackjack') }}">♠ Блэкджек</a>
+                <a href="{{ url_for('roulette') }}">🎡 Рулетка</a>
+                <a href="{{ url_for('deposit_form') }}">💳 Пополнить</a>
+                <a href="{{ url_for('logout') }}" class="logout">Выйти</a>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    <script>
+        function updateBalance(balance) {
+            const el = document.getElementById('nav-balance');
+            if (el) el.textContent = balance;
+        }
+    </script>
+</body>
+</html>

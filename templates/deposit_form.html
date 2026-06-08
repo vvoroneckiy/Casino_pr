@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Пополнение{% endblock %}
+{% block content %}
+<h1>💳 Пополнение счёта</h1>
+<div class="card" style="max-width: 400px;">
+    <form method="POST" action="{{ url_for('deposit_create') }}">
+        <div style="margin-bottom: 1.5rem;">
+            <label>Сумма пополнения (₽)</label>
+            <input type="number" name="amount" min="1" value="100" required>
+        </div>
+        <button type="submit" class="btn btn-gold" style="width:100%">💳 Получить QR-код</button>
+    </form>
+    {% if error %}<div class="error" style="margin-top: 1rem;">{{ error }}</div>{% endif %}
+</div>
+{% endblock %}
